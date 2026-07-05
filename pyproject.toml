@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bim-audit-engine"
+version = "0.1.0"
+description = "Cœur d'un moteur d'audit BIM générique : protocole de règle, boucle d'exécution injectable et AuditResult. Générique sur le catalogue et la phase ; dépend de bim-core uniquement."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+authors = [
+    { name = "Stanislas Limouzi", email = "stanislas@bimdata.io" },
+]
+keywords = [
+    "bim",
+    "ifc",
+    "audit",
+    "engine",
+    "rules",
+    "bimdata",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Other Audience",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = [
+    # Contrats communs : Finding/Severity/Theme/ErrorType + ModelSnapshot.
+    # Non publié sur PyPI — résolu via [tool.uv.sources] (tag Git).
+    "bim-core>=0.1.0,<0.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "ruff>=0.5",
+    "build>=1.2",
+]
+
+[project.urls]
+Homepage = "https://github.com/Slimouzi/bim-audit-engine"
+Repository = "https://github.com/Slimouzi/bim-audit-engine"
+
+[tool.uv.sources]
+bim-core = { git = "https://github.com/Slimouzi/bim-core.git", tag = "bim-core-v0.1.0" }
+
+[tool.setuptools.packages.find]
+include = ["bim_audit_engine*"]
+exclude = ["tests*"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
