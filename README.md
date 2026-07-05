@@ -21,8 +21,11 @@ from bim_audit_engine import Rule, run_audit, AuditResult
 - `Rule[CatalogT, PhaseT]` — `Protocol` : `(snap, catalog, phase) -> list[Finding]`.
   `CatalogT`/`PhaseT` sont **contravariants** (entrée seulement).
 - `run_audit(snap, catalog, phase, rules) -> AuditResult[CatalogT, PhaseT]` —
-  exécute les `rules` **dans l'ordre**, agrège, trie de façon **déterministe**
-  (sévérité décroissante → thème → type d'erreur → classe IFC → nom).
+  exécute les `rules` **dans l'ordre**, agrège, trie (sévérité décroissante →
+  thème → type d'erreur → classe IFC → nom). **Garantie** : pour une **même
+  séquence ordonnée de règles**, la sortie est reproductible. Le tri est
+  **stable**, pas indépendant de l'ordre : à clé égale, deux findings de règles
+  distinctes suivent l'ordre des règles.
 - `AuditResult[CatalogT, PhaseT]` — `count_by_*`, `filter(...)`,
   `conformity_rate()`, `summary()` (tolère une phase **non-Enum**).
 
@@ -67,10 +70,11 @@ print(result.summary())
 pytest -q
 ```
 
-Exécute `run_audit` avec **phase `str` et phase `Enum`**, un **catalogue factice**,
-**zéro** et **plusieurs** règles ; vérifie le tri déterministe, les agrégats,
-`summary()` sur phase non-Enum, et la **pureté** (aucun `audit_bim`/réseau à
-l'import). Offline.
+Exécute `run_audit` avec **phase `str`, phase `Enum` et phase objet**, un
+**catalogue factice**, **zéro** et **plusieurs** règles ; vérifie le déterminisme
+pour une même séquence de règles, la stabilité du tri (à clé égale → ordre des
+règles), les agrégats, la **sérialisation JSON** de `summary()` (phase objet), et
+la **pureté** (aucun `audit_bim`/réseau à l'import). Offline.
 
 ## Licence
 

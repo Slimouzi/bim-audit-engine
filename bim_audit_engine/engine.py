@@ -70,12 +70,17 @@ def run_audit(
         catalog: Catalogue d'exigences (type au choix de l'appelant).
         phase: Phase auditée (Enum ou toute valeur).
         rules: Séquence **ordonnée** de règles ``(snap, catalog, phase) ->
-            list[Finding]``. L'ordre d'exécution est préservé ; il n'influe pas
-            sur le tri final (déterministe).
+            list[Finding]``. Le tri est **stable** : à clé de tri égale, les
+            findings gardent leur ordre d'insertion (donc l'ordre des règles).
 
     Returns:
         :class:`AuditResult` — findings triés (sévérité décroissante puis thème
-        puis type d'erreur puis classe IFC puis nom), déterministe.
+        puis type d'erreur puis classe IFC puis nom).
+
+    Garantie de déterminisme : **pour une même séquence ordonnée de règles**, la
+    sortie est identique d'un appel à l'autre. Le tri n'est pas indépendant de
+    l'ordre des règles : deux findings de **même clé** issus de règles distinctes
+    apparaissent dans l'ordre où les règles sont fournies (tri stable).
     """
     findings: list[Finding] = []
     for rule in rules:

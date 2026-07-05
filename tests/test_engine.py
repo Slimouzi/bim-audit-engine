@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from enum import Enum
 
 from bim_core.findings import ErrorType, Finding, Severity, Theme
@@ -85,10 +86,41 @@ def test_deterministic_sort_severity_first():
     assert sevs == [Severity.CRITICAL, Severity.HIGH, Severity.LOW]
 
 
-def test_sort_is_stable_regardless_of_rule_order():
-    a = run_audit(_snapshot(), FakeCatalog(), Phase.AVP, rules=[_rule_high, _rule_low_and_critical])
-    b = run_audit(_snapshot(), FakeCatalog(), Phase.AVP, rules=[_rule_low_and_critical, _rule_high])
+def test_deterministic_for_a_given_rule_sequence():
+    # Garantie réelle : MÊME séquence ordonnée de règles => sortie identique.
+    rules = [_rule_high, _rule_low_and_critical]
+    a = run_audit(_snapshot(), FakeCatalog(), Phase.AVP, rules=rules)
+    b = run_audit(_snapshot(), FakeCatalog(), Phase.AVP, rules=rules)
     assert [f.name for f in a.findings] == [f.name for f in b.findings]
+    assert [f.severity for f in a.findings] == [f.severity for f in b.findings]
+
+
+def test_stable_sort_ties_follow_rule_order():
+    # Tri STABLE, PAS indépendant de l'ordre : à clé de tri égale (même
+    # sévérité/thème/type/ifc/nom), l'ordre suit celui des règles fournies.
+    def _rule_a(snap, catalog, phase):
+        return [_finding(Severity.HIGH, uuid="A1", name="same")]
+
+    def _rule_b(snap, catalog, phase):
+        return [_finding(Severity.HIGH, uuid="B1", name="same")]
+
+    ab = run_audit(_snapshot(), FakeCatalog(), Phase.AVP, rules=[_rule_a, _rule_b])
+    ba = run_audit(_snapshot(), FakeCatalog(), Phase.AVP, rules=[_rule_b, _rule_a])
+    assert [f.element_uuid for f in ab.findings] == ["A1", "B1"]
+    assert [f.element_uuid for f in ba.findings] == ["B1", "A1"]
+
+
+def test_summary_is_json_serializable_with_object_phase():
+    # Contrat JSON : une phase objet (ni Enum ni primitive) ne casse pas
+    # json.dumps(result.summary()).
+    class _OpaquePhase:
+        def __str__(self) -> str:
+            return "phase-objet"
+
+    res = run_audit(_snapshot(), FakeCatalog(), _OpaquePhase(), rules=[_rule_high])
+    dumped = json.dumps(res.summary())  # ne doit pas lever
+    assert '"phase-objet"' in dumped
+    assert res.summary()["phase"] == "phase-objet"
 
 
 def test_rule_receives_snapshot_catalog_phase():

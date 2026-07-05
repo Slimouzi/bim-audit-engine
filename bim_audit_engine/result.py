@@ -22,10 +22,17 @@ CatalogT = TypeVar("CatalogT")
 PhaseT = TypeVar("PhaseT")
 
 
-def _phase_value(phase: object) -> object:
-    """Valeur d'affichage d'une phase : ``.value`` d'un Enum si disponible,
-    sinon la valeur brute (ex. une phase ``str`` factice ne casse pas)."""
-    return getattr(phase, "value", phase)
+def _phase_value(phase: object) -> str | int | float | bool | None:
+    """Valeur **JSON-sérialisable** d'une phase.
+
+    ``.value`` d'un Enum si disponible, sinon la valeur brute. Toute valeur
+    non primitive (objet quelconque) est repliée en ``str(...)`` pour que
+    :meth:`AuditResult.summary` reste sérialisable via ``json.dumps``.
+    """
+    val = getattr(phase, "value", phase)
+    if val is None or isinstance(val, (str, int, float, bool)):
+        return val
+    return str(val)
 
 
 @dataclass

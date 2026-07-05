@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bim-audit-engine"
-version = "0.1.0"
+version = "0.1.1"
 description = "Cœur d'un moteur d'audit BIM générique : protocole de règle, boucle d'exécution injectable et AuditResult. Générique sur le catalogue et la phase ; dépend de bim-core uniquement."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -53,6 +53,11 @@ bim-core = { git = "https://github.com/Slimouzi/bim-core.git", tag = "bim-core-v
 [tool.setuptools.packages.find]
 include = ["bim_audit_engine*"]
 exclude = ["tests*"]
+
+# PEP 561 : livrer le marqueur py.typed dans le wheel pour que les consommateurs
+# bénéficient des annotations (API générique).
+[tool.setuptools.package-data]
+bim_audit_engine = ["py.typed"]
 
 [tool.ruff]
 line-length = 100
