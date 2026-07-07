@@ -1,6 +1,6 @@
 """``AuditResult`` — conteneur générique du résultat d'audit.
 
-Agrégat immuable produit par :func:`bim_audit_engine.engine.run_audit` : contexte
+Agrégat produit par :func:`bim_audit_engine.engine.run_audit` : contexte
 (phase, catalogue, snapshot), anomalies (``findings``) et statistiques dérivées.
 
 **Générique** sur le catalogue et la phase (``AuditResult[CatalogT, PhaseT]``) :
