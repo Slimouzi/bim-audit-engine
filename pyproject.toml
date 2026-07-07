@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bim-audit-engine"
-version = "0.1.1"
+version = "0.1.2"
 description = "Cœur d'un moteur d'audit BIM générique : protocole de règle, boucle d'exécution injectable et AuditResult. Générique sur le catalogue et la phase ; dépend de bim-core uniquement."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -48,7 +48,7 @@ Homepage = "https://github.com/Slimouzi/bim-audit-engine"
 Repository = "https://github.com/Slimouzi/bim-audit-engine"
 
 [tool.uv.sources]
-bim-core = { git = "https://github.com/Slimouzi/bim-core.git", tag = "bim-core-v0.1.0" }
+bim-core = { git = "https://github.com/Slimouzi/bim-core.git", tag = "bim-core-v0.1.1" }
 
 [tool.setuptools.packages.find]
 include = ["bim_audit_engine*"]
